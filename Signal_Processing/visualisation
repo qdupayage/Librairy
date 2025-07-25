@@ -1,0 +1,37 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_signal(signal, fs=None, title="Signal", show=True):
+    """
+    Plot 1D signal over time.
+    :param fs: sampling frequency (Hz) if known.
+    """
+    t = np.arange(len(signal)) if fs is None else np.arange(len(signal)) / fs
+    plt.figure()
+    plt.plot(t, signal)
+    plt.title(title)
+    plt.xlabel("Samples" if fs is None else "Time (s)")
+    plt.ylabel("Amplitude")
+    if show:
+        plt.show()
+
+def plot_spectrum(freqs, power, title="Power Spectrum", show=True):
+    """
+    Plot spectrum (from Welch/periodogram).
+    """
+    plt.figure()
+    plt.semilogy(freqs, power)
+    plt.title(title)
+    plt.xlabel("Frequency (Hz)")
+    plt.ylabel("Power")
+    if show:
+        plt.show()
+
+def print_signal_stats(signal):
+    """
+    Print basic statistics of the signal.
+    """
+    print("Mean     :", np.mean(signal))
+    print("Std Dev  :", np.std(signal))
+    print("Max      :", np.max(signal))
+    print("Min      :", np.min(signal))

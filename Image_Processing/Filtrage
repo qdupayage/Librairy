@@ -1,0 +1,128 @@
+import numpy as np
+from scipy.signal import butter, cheby1, cheby2, ellip, filtfilt, wiener, fftconvolve
+
+def bandpass_filter(signal, lowcut, highcut, fs, order=5,
+                    filter_type='butter', ripple=None, attenuation=None):
+    """
+    Apply a bandpass filter of selectable type to a 1D signal.
+
+    :param signal: 1D numpy array, input signal.
+    :param lowcut: float, low cutoff frequency (Hz).
+    :param highcut: float, high cutoff frequency (Hz).
+    :param fs: float, sampling frequency (Hz).
+    :param order: int, filter order (default=5).
+    :param filter_type: str, one of ['butter', 'cheby1', 'cheby2', 'ellip']
+        - 'butter'  : Butterworth
+        - 'cheby1'  : Chebyshev Type I (requires ripple)
+        - 'cheby2'  : Chebyshev Type II (requires attenuation)
+        - 'ellip'   : Elliptic (requires ripple & attenuation)
+    :param ripple: float or None, maximum ripple in passband (dB).
+                   Required for 'cheby1' and 'ellip'.
+    :param attenuation: float or None, minimum attenuation in stopband (dB).
+                        Required for 'cheby2' and 'ellip'.
+    :return: 1D numpy array, filtered signal.
+    """
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+
+    if filter_type == 'butter':
+        b, a = butter(order, [low, high], btype='band')
+    elif filter_type == 'cheby1':
+        if ripple is None:
+            raise ValueError("‘ripple’ (dB) must be provided for Chebyshev I")
+        b, a = cheby1(order, ripple, [low, high], btype='band')
+    elif filter_type == 'cheby2':
+        if attenuation is None:
+            raise ValueError("‘attenuation’ (dB) must be provided for Chebyshev II")
+        b, a = cheby2(order, attenuation, [low, high], btype='band')
+    elif filter_type == 'ellip':
+        if ripple is None or attenuation is None:
+            raise ValueError("Both ‘ripple’ and ‘attenuation’ must be provided for Elliptic")
+        b, a = ellip(order, ripple, attenuation, [low, high], btype='band')
+    else:
+        raise ValueError(f"Unknown filter_type ‘{filter_type}’. Choose from "
+                         "['butter','cheby1','cheby2','ellip'].")
+
+    # Zero-phase filtering to avoid phase distortion
+    y = filtfilt(b, a, signal)
+    return y
+
+
+def wiener_filter_discrete(noisy_signal, mysize=None, noise=None):
+    """
+    Apply a discrete Wiener filter (local window-based) using SciPy.
+    :param noisy_signal: 1D or 2D array.
+    :param mysize: Size of the local Wiener filter window (tuple or int).
+    :param noise: Estimated noise power. If None, estimates from signal.
+    :return: Filtered signal.
+    """
+    # SciPy's wiener performs a local Wiener filter (non-causal)
+    return wiener(noisy_signal, mysize=mysize, noise=noise)
+
+
+def wiener_filter_causal(noisy_signal, impulse_response, noise_variance):
+    """
+    Apply a causal Wiener filter via convolution with optimal impulse response.
+    :param noisy_signal: 1D numpy array of observations.
+    :param impulse_response: Impulse response of the filter (1D array).
+    :param noise_variance: Variance of additive noise.
+    :return: Filtered signal.
+    """
+    # Convolve noisy signal with filter impulse response (causal)
+    filtered = np.convolve(noisy_signal, impulse_response, mode='full')
+    # Trim to original length
+    return filtered[:len(noisy_signal)]
+
+
+def wiener_filter_noncausal(noisy_signal, filter_kernel, noise_variance):
+    """
+    Apply a non-causal Wiener filter using frequency-domain division.
+    :param noisy_signal: 1D numpy array.
+    :param filter_kernel: True system impulse response (1D array).
+    :param noise_variance: Variance of additive noise.
+    :return: Filtered signal.
+    """
+    # Compute FFTs
+    n = len(noisy_signal) + len(filter_kernel) - 1
+    H = np.fft.fft(filter_kernel, n)
+    Y = np.fft.fft(noisy_signal, n)
+    # Estimate power spectral density of signal: |H|^2 * S_xx + noise
+    # Here assume white input: S_xx = 1
+    S_nn = noise_variance
+    # Wiener filter frequency response
+    W = np.conj(H) / (H * np.conj(H) + S_nn)
+    X_est = W * Y
+    x_est = np.fft.ifft(X_est)
+    return np.real(x_est)[:len(noisy_signal)]
+
+
+def lms_filter(desired, input_signal, mu, order):
+    """
+    Adaptive filter using Least Mean Squares (LMS) algorithm.
+    :param desired: Desired signal (1D array).
+    :param input_signal: Input signal to filter (1D array).
+    :param mu: Step size (learning rate).
+    :param order: Filter order (number of taps).
+    :return: tuple (output, error, weights_history)
+    """
+    n_samples = len(input_signal)
+    # Initialize
+    weights = np.zeros(order)
+    output = np.zeros(n_samples)
+    error = np.zeros(n_samples)
+    weights_history = np.zeros((n_samples, order))
+
+    # Pad input for running window
+    x = np.concatenate([np.zeros(order-1), input_signal])
+
+    for n in range(n_samples):
+        x_n = x[n:n+order][::-1]  # current input vector
+        y_n = np.dot(weights, x_n)
+        output[n] = y_n
+        error[n] = desired[n] - y_n
+        # Update weights
+        weights = weights + 2 * mu * error[n] * x_n
+        weights_history[n, :] = weights
+
+    return output, error, weights_history

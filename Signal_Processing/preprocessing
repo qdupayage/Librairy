@@ -1,0 +1,25 @@
+import numpy as np
+from scipy.signal import butter, filtfilt, resample_poly
+
+def downsample(signal, factor, anti_aliasing=True, cutoff=0.8):
+    """
+    Downsample signal with optional anti-aliasing filter.
+    :param signal: input signal.
+    :param factor: integer downsampling factor.
+    :param anti_aliasing: if True, apply low-pass filter before.
+    :param cutoff: normalized cutoff freq (0-1), for anti-aliasing.
+    """
+    if anti_aliasing:
+        nyq = 0.5 * factor
+        b, a = butter(5, cutoff / nyq)
+        signal = filtfilt(b, a, signal)
+    return signal[::factor]
+
+def upsample(signal, factor):
+    """
+    Upsample signal using polyphase filtering (resample_poly).
+    :param signal: input signal.
+    :param factor: integer upsampling factor.
+    :return: upsampled signal.
+    """
+    return resample_poly(signal, up=factor, down=1)
