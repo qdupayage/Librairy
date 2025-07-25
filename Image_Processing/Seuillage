@@ -1,0 +1,47 @@
+import cv2
+import numpy as np
+
+def simple_threshold(image, thresh=128, maxval=255):
+    """
+    Seuil binaire simple : pixel > thresh → maxval, sinon 0.
+    :param image: image niveau de gris (ndarray).
+    :param thresh: seuil.
+    :param maxval: valeur pour les pixels > thresh.
+    :return: image binaire.
+    """
+    _, binary = cv2.threshold(image, thresh, maxval, cv2.THRESH_BINARY)
+    return binary
+
+def otsu_threshold(image):
+    """
+    Seuil automatique d’Otsu : trouve le meilleur thresh.
+    :param image: image niveau de gris.
+    :return: (thresh_optimal, image binaire).
+    """
+    thresh, binary = cv2.threshold(
+        image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+    )
+    return thresh, binary
+
+def adaptive_threshold(image, maxval=255, method='gaussian',
+                       block_size=11, C=2):
+    """
+    Seuil adaptatif : le seuil est calculé localement.
+    :param image: image niveau de gris.
+    :param maxval: valeur de sortie (> thresh).
+    :param method: 'mean' ou 'gaussian'.
+    :param block_size: taille de la fenêtre (impair).
+    :param C: constante à soustraire.
+    :return: image binaire.
+    """
+    if method == 'mean':
+        m = cv2.ADAPTIVE_THRESH_MEAN_C
+    elif method == 'gaussian':
+        m = cv2.ADAPTIVE_THRESH_GAUSSIAN_C
+    else:
+        raise ValueError("method doit être 'mean' ou 'gaussian'")
+    binary = cv2.adaptiveThreshold(
+        image, maxval, m, cv2.THRESH_BINARY,
+        block_size, C
+    )
+    return binary

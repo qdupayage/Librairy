@@ -1,0 +1,36 @@
+import cv2
+
+def detect_blobs(image, params=None):
+    """
+    Détection de blobs via SimpleBlobDetector.
+    :param image: image niveau de gris ou couleur.
+    :param params: cv2.SimpleBlobDetector_Params ou None pour défauts.
+    :return: liste de keypoints (x, y, taille…).
+    """
+    if params is None:
+        params = cv2.SimpleBlobDetector_Params()
+        # Exemple de réglages par défaut :
+        params.minThreshold = 10
+        params.maxThreshold = 200
+        params.filterByArea = True
+        params.minArea = 30
+        params.filterByCircularity = False
+        params.filterByConvexity = False
+        params.filterByInertia = False
+    detector = cv2.SimpleBlobDetector_create(params)
+    keypoints = detector.detect(image)
+    return keypoints
+
+def draw_blobs(image, keypoints):
+    """
+    Trace les blobs détectés sur l’image.
+    :param image: image couleur (BGR) ou niveau de gris.
+    :param keypoints: liste renvoyée par detect_blobs.
+    :return: image annotée.
+    """
+    out = cv2.drawKeypoints(
+        image, keypoints, None,
+        (0, 0, 255),
+        cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS
+    )
+    return out
