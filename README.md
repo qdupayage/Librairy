@@ -26,6 +26,14 @@ Ce dépôt centralise plusieurs travaux réalisés dans les domaines du **traite
 
 ---
 
+### ☁️ Java Project — Synthétiseur de son
+- Librairie fournie d'analyse audio: lib\phelmaaudio.jar
+- Construction d'une structure de "module", ayant différents paramètres:
+- Port de connexion, entrée, sortie, patch, etc...
+- Synthétisation d'opérations de traitements audio: ecchos, atténuation, etc
+
+---
+
 ### 🧠 data_process/
 - Implémentations :
   - 📊 **ACP** (Python et MATLAB)
