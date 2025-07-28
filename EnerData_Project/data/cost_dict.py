@@ -1,5 +1,5 @@
 cost_dict = {
-    'nuclear': 40,
+    'nuclear': 47,
     'wind': 50,
     'hydrolien': 60,
     'gas': 135,

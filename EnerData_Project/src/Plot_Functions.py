@@ -46,9 +46,9 @@ def compute_market_price_by_country(df, cost_dict):
 
     Returns:
         pd.DataFrame: prix spot pour chaque pays, colonne par pays
+        pd.DataFrame: techno marginale (celle qui fixe le prix) pour chaque heure et chaque pays
     """
     countries = df['country'].unique()
-    price_df = pd.DataFrame(index=df['DateTime'].unique())
 
     for country in countries:
         df_country = df[df['country'] == country].copy()
@@ -57,37 +57,51 @@ def compute_market_price_by_country(df, cost_dict):
         # Récupérer toutes les colonnes de production pour ce pays
         prod_cols = [col for col in df_country.columns if col.startswith('prod_') and col.endswith(f"_{country}")]
 
-        mix = []
-        for col in prod_cols:
-            source = col.split('_')[1]  # extrait NRJ_prod
-            if source in cost_dict:
-                mix.append((cost_dict[source], df_country[col]))
-
-        # Créer la table triée selon le coût
-        mix.sort(key=lambda x: x[0])  # trie par coût
-
         # Approximation de la consommation nette = somme production + solde interconnexions
-        prod_total = sum([p for _, p in mix])
         interco_cols = [col for col in df_country.columns if 'interconnexion' in col.lower() and col.endswith(f"_{country}")]
         solde_interco = df_country[interco_cols].sum(axis=1) if interco_cols else 0
-        demande = prod_total + solde_interco
+
+        demande = df_country[prod_cols].sum(axis=1) + solde_interco
 
         # Calcul du prix spot horaire
         spot_prices = []
+        marginal_sources = []
+
         for t in df_country.index:
+            mix = []
+            for col in prod_cols:
+                source = col.split('_')[1]
+                if source in cost_dict:
+                    prod_value = df_country.at[t, col]
+                    if prod_value > 0:
+                        mix.append((cost_dict[source], source, prod_value))
+
+            mix.sort(key=lambda x: x[0])  # tri par coût croissant
+
             reste = demande[t]
             prix = np.nan
-            for cost, prod in mix:
-                if prod[t] >= reste:
+            marginal = None
+
+            for cost, source, prod in mix:
+                if prod >= reste:
                     prix = cost
+                    marginal = source
                     break
                 else:
-                    reste -= prod[t]
+                    reste -= prod
+
+            # Cas où la demande dépasse l’offre disponible
+            if prix is np.nan and mix:
+                prix = mix[-1][0]
+                marginal = mix[-1][1]
+
             spot_prices.append(prix)
+            marginal_sources.append(marginal)
 
-        price_df[country] = spot_prices
+        df[f"Estimated_Price_{country}"] = spot_prices
+        df[f"marginal_tech_{country}"] = marginal_sources
 
-    return price_df
+    return df
 
 def estimate_electricity_price(df, production_columns, cost_dict, demand_column):
     """
