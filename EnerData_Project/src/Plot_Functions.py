@@ -62,58 +62,63 @@ def compute_market_price_by_country(df, cost_dict):
         pd.DataFrame: prix spot pour chaque pays, colonne par pays
         pd.DataFrame: techno marginale (celle qui fixe le prix) pour chaque heure et chaque pays
     """
-    countries = df['country'].unique()
+    for col in df.columns:
+        if col.startswith("Prod_"):
+            try:
+                country = col.split('_')[2]
+                break
+            except ValueError:
+                continue
+    
+    # Colonnes de production pour ce pays
+    prod_cols = [col for col in df.columns if col.startswith("Prod_") and col.endswith(f"_{country}")]
+    # Demande
+    demand_col = f"Demand_{country}"
 
-    for country in countries:
-        df_country = df[df['country'] == country].copy()
-        df_country = df_country.set_index('DateTime')
+    if demand_col not in df.columns:
+        print(f"Pas de demande pour {country}, on ignore.")
 
-        # Récupérer toutes les colonnes de production pour ce pays
-        prod_cols = [col for col in df_country.columns if col.startswith('prod_') and col.endswith(f"_{country}")]
+    # Liste pour stocker les résultats
+    price_list = []
+    marginal_list = []
 
-        # Approximation de la consommation nette = somme production + solde interconnexions
-        interco_cols = [col for col in df_country.columns if 'interconnexion' in col.lower() and col.endswith(f"_{country}")]
-        solde_interco = df_country[interco_cols].sum(axis=1) if interco_cols else 0
+    for t in df.index:
+        demand = pd.to_numeric(df.at[t, demand_col], errors='coerce')
+        mix = []
 
-        demande = df_country[prod_cols].sum(axis=1) + solde_interco
+        for col in prod_cols:
+            _, tech, _ = col.split('_')
+            prod_value = pd.to_numeric(df.at[t, col], errors='coerce')
+            if tech in cost_dict:
+                cost = cost_dict[tech]
+                mix.append((cost, tech, prod_value))
 
-        # Calcul du prix spot horaire
-        spot_prices = []
-        marginal_sources = []
+        # Trier par coût croissant
+        mix.sort(key=lambda x: x[0])
 
-        for t in df_country.index:
-            mix = []
-            for col in prod_cols:
-                source = col.split('_')[1]
-                if source in cost_dict:
-                    prod_value = df_country.at[t, col]
-                    if prod_value > 0:
-                        mix.append((cost_dict[source], source, prod_value))
+        reste = demand
+        price = np.nan
+        marginal = None
 
-            mix.sort(key=lambda x: x[0])  # tri par coût croissant
+        for cost, tech, quantity in mix:
+            if quantity >= reste:
+                price = cost
+                marginal = tech
+                break
+            else:
+                reste -= quantity
 
-            reste = demande[t]
-            prix = np.nan
-            marginal = None
+        # Si l’offre ne suffit pas à couvrir la demande
+        if np.isnan(price) and mix:
+            price = mix[-1][0]
+            marginal = mix[-1][1]
 
-            for cost, source, prod in mix:
-                if prod >= reste:
-                    prix = cost
-                    marginal = source
-                    break
-                else:
-                    reste -= prod
+        price_list.append(price)
+        marginal_list.append(marginal)
 
-            # Cas où la demande dépasse l’offre disponible
-            if prix is np.nan and mix:
-                prix = mix[-1][0]
-                marginal = mix[-1][1]
-
-            spot_prices.append(prix)
-            marginal_sources.append(marginal)
-
-        df[f"Estimated_Price_{country}"] = spot_prices
-        df[f"marginal_tech_{country}"] = marginal_sources
+    # Ajouter les colonnes résultats au DataFrame
+    df[f"Estimated_Price_{country}"] = price_list
+    df[f"marginal_tech_{country}"] = marginal_list
 
     return df
 
@@ -147,3 +152,91 @@ def estimate_electricity_price(df, production_columns, cost_dict, demand_column)
         unit_price *= supply_ratio.clip(lower=1.0)  # surcharge si demande > production
 
     return unit_price.fillna(0)
+
+import pypsa
+import pandas as pd
+
+def create_simple_network(df, countries, cost_dict=None):
+    """
+    Crée un réseau PyPSA à partir d'un DataFrame contenant des colonnes horodatées de production,
+    de demande et d'interconnexions entre pays.
+
+    Args:
+        df (pd.DataFrame): DataFrame avec index DateTime et colonnes :
+            - Demand_{country}
+            - Prod_{tech}_{country}
+            - link_{src}_{dst}
+        countries (list): liste des pays à inclure
+        cost_dict (dict): dictionnaire des coûts marginaux (€/MWh) par techno (optionnel)
+
+    Returns:
+        pypsa.Network
+    """
+    # 0. Prérequis
+    df = df.apply(pd.to_numeric, errors='coerce')
+
+    # 1. Créer le réseau
+    net = pypsa.Network()
+    net.set_snapshots(df.index)
+
+    # 2. Ajouter les bus
+    for country in countries:
+        net.add("Bus", name=country, country=country, carrier="AC")
+
+    # 3. Ajouter les charges (Load_{country})
+    for country in countries:
+        demand_col = f"Demand_{country}"
+        if demand_col in df.columns:
+            net.add("Load",
+                    name=f"Load_{country}",
+                    bus=country,
+                    p_set=df[demand_col])
+        else:
+            print(f"Avertissement : colonne {demand_col} manquante.")
+
+    # 4. Ajouter les générateurs (Prod_{tech}_{country})
+    for country in countries:
+        prod_cols = [col for col in df.columns if col.startswith("Prod_") and col.endswith(f"_{country}")]
+        for col in prod_cols:
+            _, tech, _ = col.split('_')
+            
+            # Conversion explicite en float
+            p_max_pu = pd.to_numeric(df[col], errors='coerce')
+            p_nom = p_max_pu.max()
+
+            # Sécurité : ignorer si colonne vide ou sans valeurs numériques
+            if pd.isna(p_nom) or p_nom == 0:
+                print(f"Avertissement : production vide ou nulle pour {col}, ignoré.")
+                continue
+
+            net.add("Generator",
+                    name=col,
+                    bus=country,
+                    carrier=tech,
+                    p_nom=p_nom,
+                    p_max_pu=p_max_pu / p_nom,
+                    marginal_cost=cost_dict.get(tech, 100) if cost_dict else 100)
+
+    # 5. Ajouter les interconnexions (link_src_dst)
+    link_cols = [col for col in df.columns if col.startswith("link_")]
+    for col in link_cols:
+        try:
+            _, src, dst = col.split('_')
+        except ValueError:
+            continue
+
+        if src in countries and dst in countries:
+            p_set = pd.to_numeric(df[col],errors='coerce')
+            capacity = p_set.abs().max()  # approximation de capacité max
+            net.add("Link",
+                    name=col,
+                    bus0=src,
+                    bus1=dst,
+                    p_nom=capacity,
+                    p_set=p_set,
+                    marginal_cost=0,
+                    efficiency=1.0)
+        else:
+            print(f"Ignoré : {col} (src ou dst non dans {countries})")
+
+    return net

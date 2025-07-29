@@ -1,11 +1,11 @@
 cost_dict = {
-    'nuclear': 47,
-    'wind': 50,
-    'hydrolien': 60,
-    'gas': 135,
-    'coal': 210,
-    'oil': 220,
-    'solar': 60
+    'Nuclear': 47,
+    'Wind': 50,
+    'Hydro': 60,
+    'Gas': 135,
+    'Coal': 210,
+    'Oil': 220,
+    'Solar': 60
 }
 #Source	Coût_base(€/MWh)  Taxe CO2 (€/MWh)	Total estimé (€/MWh)
 # Wind	      50	            0	               50
