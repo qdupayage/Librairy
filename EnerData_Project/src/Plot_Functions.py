@@ -2,32 +2,46 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-def plot_timeseries(df, variables, title=None, ylabel=None, legend=True, source_type='entsoe'):
+def plot_timeseries(df, variables, title=None, ylabel=None, legend=True, source_type=''):
     """
-    Affiche des courbes temporelles en fonction du type de source de données (entsoe, pypsa, c3s...)
-
-    Parameters:
-        df (pd.DataFrame): dataframe contenant une colonne 'DateTime' et les variables
-        variables (list): liste des colonnes à afficher
-        title (str): titre du graphique
-        ylabel (str): nom de l'axe y
-        legend (bool): affiche ou non la légende
-        source_type (str): type de données ('entsoe', 'pypsa', 'c3s', etc.)
+    Affiche des courbes temporelles (x = DateTime).
     """
-    # Filtrer les lignes correspondant au type de source
-    if source_type in df.columns:
-        df = df[df[source_type] == source_type]
+    # Vérifier la présence de DateTime
+    if 'DateTime' not in df.columns:
+        raise ValueError("Colonne 'DateTime' absente du DataFrame.")
 
+    # Nettoyage : s'assurer que DateTime est bien datetime64
+    df['DateTime'] = pd.to_datetime(df['DateTime'], errors='coerce')
+
+    # Supprimer lignes vides ou incorrectes
+    df = df.dropna(subset=['DateTime'])
+
+    # Vérifie si on a des variables valides
+    variables_valides = [var for var in variables if var in df.columns]
+    if not variables_valides:
+        raise ValueError("Aucune variable valide parmi : " + ", ".join(variables))
+
+    # Convertir toutes les autres colonnes en numériques si besoin
+    for col in df.columns:
+        if col != 'DateTime':
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # Affichage
     plt.figure(figsize=(15, 5))
 
-    for var in variables:
-        if var in df.columns:
+    for var in variables_valides:
+        if np.issubdtype(df[var].dtype, np.number):
+            # FORCER le x explicite = DateTime
             plt.plot(df['DateTime'], df[var], label=var)
+        else:
+            print(f"[AVERTISSEMENT] Variable ignorée (non-numérique) : {var}")
 
+    # Ajout titres et légendes
     if title:
-        plt.title(f"{title} ({source_type.upper()})")
+        plt.title(f"{title} ({source_type.upper()})" if source_type else title)
     if ylabel:
         plt.ylabel(ylabel)
+
     plt.xlabel("DateTime")
     if legend:
         plt.legend()

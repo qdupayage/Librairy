@@ -14,9 +14,9 @@ def load_parquet(filepath: str) -> pd.DataFrame:
         df['DateTime'] = pd.to_datetime(df['DateTime'])
     return df
 
-def construct_dataframe(df, countries, time_range=['2023-06-01', '2023-06-03'],
+def construct_dataframe(df, countries, time_range=['2023-01-01', '2023-01-03'],
                         production_name=[], Interconnexions=True, Demand=True, Price=True,
-                        freq='H'):
+                        freq='h'):
     """
     Construit un DataFrame horodaté avec les données sélectionnées pour les pays donnés.
 
@@ -68,3 +68,28 @@ def construct_dataframe(df, countries, time_range=['2023-06-01', '2023-06-03'],
                 result_df = result_df.join(df[[price_col]], how='left')
 
     return result_df.reset_index()
+
+def read_csv(path):
+    """
+    Corrige les erreurs dues à un CSV avec une ligne DateTime mal alignée.
+    Reconstruit correctement le DataFrame avec les colonnes et les données alignées.
+    """
+    # Lire tout le fichier sans traiter les en-têtes
+    raw_df = pd.read_csv(path, header=None)
+
+    # Ligne 0 contient les noms de colonnes
+    column_names = raw_df.iloc[0].tolist()
+    
+    # Ligne 2+ contient les vraies données
+    data = raw_df.iloc[2:].reset_index(drop=True)
+    data.columns = column_names
+
+    # Créer un DateTime bien formatté
+    if 'DateTime' in data.columns:
+        data['DateTime'] = pd.to_datetime(data['DateTime'])
+    else:
+        # Cas rare : DateTime est uniquement dans la 2e ligne
+        datetime_values = pd.to_datetime(raw_df.iloc[1, 1:].dropna().tolist())
+        data['DateTime'] = datetime_values
+
+    return data
