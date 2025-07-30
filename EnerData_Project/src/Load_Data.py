@@ -46,7 +46,7 @@ def construct_dataframe(df, countries, time_range=['2023-01-01', '2023-01-03'],
     for country in countries:
         # Production : on ajoute chaque prod demandée
         for prod in production_name:
-            col_name = f"prod_{prod}_{country}"
+            col_name = f"Prod_{prod}_{country}"
             if col_name in df.columns:
                 result_df = result_df.join(df[[col_name]], how='left')
 
