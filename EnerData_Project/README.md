@@ -16,3 +16,8 @@ Ce projet a été réalisé dans le cadre de mon stage de 2ème année. L’obje
 
 - Python (pandas, pypsa, matplotlib, pathlib)
 - Jupyter Notebook
+
+## Installation
+
+```bash
+pip install -r requirements.txt
