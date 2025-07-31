@@ -11,3 +11,13 @@ def get_models():
         "Decision Tree": DecisionTreeClassifier(),
         "Random Forest": RandomForestClassifier()
     }
+
+def get_specific_models(a):
+    if a == 0:
+        return KNeighborsClassifier(n_neighbors=5)
+    elif a ==1:
+        return LogisticRegression()
+    elif a == 2:
+        return DecisionTreeClassifier()
+    else:
+        return RandomForestClassifier()
