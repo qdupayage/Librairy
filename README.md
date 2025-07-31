@@ -11,6 +11,12 @@ Ce dépôt centralise plusieurs travaux réalisés dans les domaines du **traite
 
 ## 🚀 Projets principaux
 
+### 🔋 Détection électronique — Détecteur handisport pour tir à la carabine
+- Algorithme de traitement vidéo: seuillage, ...
+- Guidage audio du dispositif
+
+---
+
 ### 🔋 Enerdata — Simulation réseau électrique (Panel App + PyPSA)
 - Visualisation des données énergétiques au pas horaire
 - Interface multi-onglets avec **Panel**
@@ -26,21 +32,11 @@ Ce dépôt centralise plusieurs travaux réalisés dans les domaines du **traite
 
 ---
 
-### ☁️ Java Project — Synthétiseur de son
+### ☁️ Java Work — Synthétiseur de son
 - Librairie fournie d'analyse audio: lib\phelmaaudio.jar
 - Construction d'une structure de "module", ayant différents paramètres:
 - Port de connexion, entrée, sortie, patch, etc...
 - Synthétisation d'opérations de traitements audio: ecchos, atténuation, etc
-
----
-
-### 🧠 data_process/
-- Implémentations :
-  - 📊 **ACP** (Python et MATLAB)
-  - 🧠 **Réseaux de neurones convolutionnels**
-  - 🧪 **Optimisation** (descente de gradient, Newton)
-  - 🔍 **Filtrage de Kalman**, clustering, etc.
-- Comparaisons MATLAB ↔ Python
 
 ---
 
@@ -52,17 +48,11 @@ Ce dépôt centralise plusieurs travaux réalisés dans les domaines du **traite
 
 ---
 
-### 🖼️ Image Process
-- Seuillage (global, adaptatif)
-- Détection de formes (Hough)
-- Détection de blobs et contours
-
----
-
-### ☕ Java_Work
-- Projets audio/numériques en Java
-- Librairie externe `phelmaaudio.jar`
-- Fichiers `.java` fonctionnels + tests
+### 🖼️ Social analysis
+- Extraction des données, avec source
+- Préprocessing, encodage des data
+- Choix du modèle
+- Construction et entrainement du modèle 
 
 ---
 
