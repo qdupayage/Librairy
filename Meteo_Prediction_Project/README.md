@@ -13,7 +13,7 @@ Ce projet a été réalisé dans le cadre d’une initiation au machine learning
    - Régression logistique
    - Arbre de décision
    - RandomForest
-6. Évaluation (accuracy, F1-score, confusion matrix)
+6. Évaluation (accuracy, F1-score, confusion matrix, RSE, RMSE, MAE, R²)
 7. Choix du meilleur modèle
 
 ## Tech stack
