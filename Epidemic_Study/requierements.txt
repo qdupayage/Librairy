@@ -1,0 +1,8 @@
+txt
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+scipy
+requests
