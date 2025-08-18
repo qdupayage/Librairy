@@ -19,3 +19,10 @@ cd EpidemioStudy
 
 ```Instalation
 pip install -r requirements.txt
+
+📚 Données utilisées
+
+Les données proviennent de Google COVID-19 Open Data.
+👉 Pour alléger le dépôt, les données ne sont pas stockées dans le repo.
+Elles sont téléchargées automatiquement par le notebook au besoin depuis :
+https://storage.googleapis.com/covid19-open-data/v3/epidemiology.csv
