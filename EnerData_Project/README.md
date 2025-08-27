@@ -2,6 +2,24 @@
 
 Ce projet a été réalisé dans le cadre de mon stage de 2ème année. L’objectif était de construire un modèle prédictif basé sur des données météorologiques (ex : température, précipitation, ensoleillement), ainsi que des données de consomation et production énergétiques (ex : production de nucleaire, échange entre Pays1 et Pays2, consomation, prix de la taxe sur le CO2) afin de prédire le prix de l'électricité, et de fournir une prédiction horodatée. Je n'ai pu utiliser le code, ni les données de ce projet, car c'est un projet privé. Cependant, j'ai réalisé un projet similaire, en générant des données afin de simuler les fonctions d'affichages, de calculs de coûts, etc...
 
+## Contexte et objectifs
+- Analyser les différents facteurs influants sur le prix de l'électricité dans le parc Européen
+- Construire une fonction de prédiction des données au pas horraire
+- Implémenter un réseaux virtuel afin d'effectuer des simulations énergétiques sur des périodes
+
+## Données utilisées
+
+- Les données provenez de la base de donnée de l'entreprise: propre récolte de données, data achetée à des data-provider (entsoe, C3s, ...) 
+- Pour l'application dans ce projet, j'ai retrouvé des data, au pas horaires, pour la france en 2023
+
+## Structure du projet
+
+- `notebooks/test.ipynb` – Notebook principal d’analyse & visualisation
+- `data/` – Dossier local contenant le dataset à analyser
+- `src/` – Dossier contenant les fonctions principales d'analyse, d'affichage
+- `requirements.txt`
+- `README.md`
+
 ## Étapes du projet
 
 1. Automatisation du chargement et nettoyage des data du serveur

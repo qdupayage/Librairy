@@ -9,8 +9,15 @@ Il s’appuie sur des données publiques (comme le jeu de données Adult Census 
 - Classer les individus selon différents profils
 - Construire des modèles de prédiction (revenu, groupe social, etc.)
 
-## 🗂️ Installer les dépendances
-pip install -r requirements.txt
-
 ## Source des données
 https://archive.ics.uci.edu/dataset/2/adult
+
+## Structure
+- `notebooks/Socio_Study.ipynb` – Notebook principal d’analyse & visualisation
+- `data/` – Dossier local contenant les dataset
+- `src/` – Dossier contenant les fonctions principales d'analyses
+- `requirements.txt`
+- `README.md`
+
+## 🗂️ Installer les dépendances
+pip install -r requirements.txt

@@ -33,5 +33,5 @@ Il a été initié dans le cadre de travaux réalisés dans le labo GIPSA-Lab, G
 2. **Lancer le projet** :
    ```bash
    cd Ce_dépot
-   conda activate MCP ("environnement virtuel")/ pip install -r requirements.txt
+   pip install -r requirements.txt
    streamlit App.py
