@@ -1,37 +1,37 @@
-# Visualisation de données statistiques pour analyse de signaux sonores
+# Visualisation of statistical data for sound signal analysis
 
-Ce projet visualise des entités statistiques afin d'analyser des signaux sonores, dans le but de mesurer l'avancement de la réaction mécanochimique dont le son a été enregistré.
-Il a été initié dans le cadre de travaux réalisés dans le labo GIPSA-Lab, Grenoble, où j’ai participé à l’analyse de signaux sonores des réactions mécanochimiques
+This project visualises statistical entities in order to analyse sound signals, with the aim of measuring the progress of the mechanochemical reaction whose sound has been recorded.
+It was initiated as part of work carried out at the GIPSA-Lab in Grenoble, where I participated in the analysis of sound signals from mechanochemical reactions.
 
 ---
 
-## 🧰 Technologies utilisées
+## 🧰 Technologies used
 
 - Python (pandas, numpy, matplotlib)
 - Streamlit, OS
-- Scipy (".signal",".stats")
-- Données sonores (dfférents bruit de réactions enregistrés)
+- Scipy (‘.signal’,‘.stats’)
+- Sound data (various recorded reaction noises)
 
 
 ---
 
-## 🚀 Objectifs
+## 🚀 Objectives
 
-- Visualiser l'évolution du signal'
-- Appliquer et visualiser les opérations statistiques
-- Comparer les différentss sentités statistiques 
+- Visualise the evolution of the signal
+- Apply and visualise statistical operations
+- Compare different statistical sensitivities 
 
 ---
 
-## 🔧 Lancer le projet
+## 🔧 Launch the project
 
-1. **Cloner ce dépôt** :
+1. **Clone this repository**:
    ```bash
-   git clone https://gitlab.ensimag.fr/dupayagq/bibliotheque/EnerData_Projet.git
-   cd Signal_Analysis_Projet
+   git clone https://gitlab.ensimag.fr/dupayagq/Library
+   cd Signal_Analysis_Project
 
-2. **Lancer le projet** :
+2. **Launch the project**:
    ```bash
-   cd Ce_dépot
+   cd This_repository
    pip install -r requirements.txt
    streamlit App.py

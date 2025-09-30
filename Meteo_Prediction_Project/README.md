@@ -1,34 +1,34 @@
-# Prédiction météorologique avec Machine Learning
+# Weather forecasting with machine learning
 
-Ce projet a été réalisé dans le cadre d’une initiation au machine learning. L’objectif était de construire un modèle prédictif basé sur des données météorologiques (ex : température, humidité, pression) afin de prédire une variable cible (ex : pluie, température max).
+This project was carried out as part of an introduction to machine learning. The aim was to build a predictive model based on meteorological data (e.g. temperature, humidity, pressure) in order to predict a target variable (e.g. rain, maximum temperature).
 
-## Contexte et objectifs
--La commune de grenoble, très industrialisée, est proie à des pics de pollution. Le but étend de prédire ces pics de pollution en fonction de données météorologiques fournies.
--Construction et comparaison de plusieurs modèle de ML pour la prédiction des pics de pollution de l'année 2018
+## Context and objectives
+-The highly industrialised city of Grenoble is prone to pollution peaks. The aim is to predict these pollution peaks based on the meteorological data provided.
+-Construction and comparison of several ML models for predicting pollution peaks in 2018
 
-## Données utilisées
--Un dataset "meteo.csv" nous a été fournie, disposant des données de 2017 et 2018
+## Data used
+-A dataset called ‘meteo.csv’ was provided to us, containing data from 2017 and 2018.
 
 ## Structure
-- `notebooks/prediction_meteo.ipynb` – Notebook principal d’analyse & visualisation
-- `data/meteo.csv` – DataSet regroupant les données de chaques stations météorologique sur 2017/2018
-- `src/` – Dossier contenant les fonctions principales de traitements de données
-- `utils/` - Dossier contenant les fonctions principales d'affichage
+- `notebooks/prediction_meteo.ipynb` – Main analysis & visualisation notebook
+- `data/meteo.csv` – DataSet containing data from each weather station for 2017/2018
+- `src/` – Folder containing the main data processing functions
+- `utils/` - Folder containing the main display functions
 - `requirements.txt`
 - `README.md`
 
-## Étapes du projet
+## Project steps
 
-1. Chargement et nettoyage du dataset météo
-2. Prétraitement des données (valeurs manquantes, normalisation, encoding)
-3. Visualisation des corrélations
-4. Séparation du dataset (train/test, validation croisée k-folds)
-5. Comparaison de plusieurs algorithmes de ML :
+1. Loading and cleaning the weather dataset
+2. Pre-processing the data (missing values, normalisation, encoding)
+3. Visualisation of correlations
+4. Separation of the dataset (train/test, k-folds cross-validation)
+5. Comparison of several ML algorithms:
    - KNN
-   - Régression logistique
-   - Arbre de décision
+   - Logistic regression
+   - Decision tree
    - RandomForest
-6. Évaluation (accuracy, F1-score, confusion matrix, RSE, RMSE, MAE, R²)
+6. Evaluation
 7. Choix du meilleur modèle
 
 ## Tech stack
@@ -36,7 +36,7 @@ Ce projet a été réalisé dans le cadre d’une initiation au machine learning
 - Python (pandas, scikit-learn, matplotlib, seaborn)
 - Jupyter Notebook
 
-## Usage
+## Utilisation
 ```bash
 pip install -r requirements.txt
 jupyter lab notebooks/prediction_meteo.ipynb

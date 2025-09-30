@@ -1,23 +1,23 @@
-# 📊 Étude comportementale et sociale — Classification d'individus
+# 📊 Behavioural and social study — Classification of individuals
 
-Ce projet a pour objectif d'étudier et de classer des individus selon divers critères sociaux et économiques (âge, revenus, éducation, situation familiale, etc.).  
-Il s’appuie sur des données publiques (comme le jeu de données Adult Census Income) pour explorer les comportements et profils types.
+The aim of this project is to study and classify individuals according to various social and economic criteria (age, income, education, family situation, etc.).  
+It uses public data (such as the Adult Census Income dataset) to explore typical behaviours and profiles.
 
-## 🔍 Objectifs
-- Nettoyer et analyser un jeu de données socio-économiques
-- Identifier des corrélations entre variables sociales
-- Classer les individus selon différents profils
-- Construire des modèles de prédiction (revenu, groupe social, etc.)
+## 🔍 Objectives
+- Clean and analyse a socio-economic dataset
+- Identify correlations between social variables
+- Classify individuals according to different profiles
+- Build prediction models (income, social group, etc.)
 
-## Source des données
+## Data source
 https://archive.ics.uci.edu/dataset/2/adult
 
 ## Structure
-- `notebooks/Socio_Study.ipynb` – Notebook principal d’analyse & visualisation
-- `data/` – Dossier local contenant les dataset
-- `src/` – Dossier contenant les fonctions principales d'analyses
+- `notebooks/Socio_Study.ipynb` – Main analysis & visualisation notebook
+- `data/` – Local folder containing the datasets
+- `src/` – Folder containing the main analysis functions
 - `requirements.txt`
 - `README.md`
 
-## 🗂️ Installer les dépendances
+## 🗂️ Install dependencies
 pip install -r requirements.txt
