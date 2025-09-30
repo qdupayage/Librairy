@@ -1,20 +1,18 @@
-# Librairy — Collection de projets d’ingénierie et data science
+# Librairy — Collection of Engineering and Data Science Projects
 
-Bienvenue dans **Librairy**, mon dépôt centralisé de projets personnels et académiques en sciences des données, vision, audio, simulation énergétique, analyse sociale, et épidémiologie.
+Welcome to **Librairy**, my centralized repository of personal and academic projects in data science, computer vision, audio, energy simulation, social analysis, and epidemiology.
 
 ## Structure
-- **Detection_Electronique** – Détection vidéo + guidage audio pour le handisport
-- **EnerData_Project** – Simulation de réseaux électriques avec PyPSA
-- **Meteo_Prediction_Project** – Modèles ML sur données météo
-- **Signal_Processing** / **Signal_Analysis_Project** – Traitement du signal (FFT, filtres, visualisation)
-- **Image_Processing** – Vision par ordinateur (non détaillé)
-- **Java_Work** – Synthétiseur modulaire en Java
-- **Social_Analysis** – Analyse de données sociales
-- **Epidemic_Study** – Étude épidémiologique (prévision de cas, R_t, cartes)
+- **Detection_Electronique** – Video detection + audio guidance for parasports
+- **EnerData_Project** – Power grid simulation with PyPSA
+- **Meteo_Prediction_Project** – ML models on weather data
+- **Signal_Analysis_Project** – Signal processing (FFT, filters, visualization)
+- **Java_Work** – Modular synthesizer in Java
+- **Social_Analysis** – Social data analysis
+- **Epidemic_Study** – Epidemiological study (case prediction, R_t, maps)
 
 ## ⚙️ Installation
 
 ```bash
-# Installation des dépendances globales
+# Install global dependencies
 pip install -r requirements.txt
-

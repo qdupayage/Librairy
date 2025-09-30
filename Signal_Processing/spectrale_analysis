@@ -1,0 +1,29 @@
+pip install scipy numpy matplotlib statsmodels
+
+import numpy as np
+from scipy.signal import welch, periodogram
+from statsmodels.tsa.stattools import acf
+
+def compute_periodogram(signal, fs):
+    """
+    Estimate PSD using standard periodogram.
+    :return: freqs, power
+    """
+    freqs, power = periodogram(signal, fs=fs)
+    return freqs, power
+
+def compute_welch(signal, fs, nperseg=256):
+    """
+    Estimate PSD using Welch method.
+    :return: freqs, power
+    """
+    freqs, power = welch(signal, fs=fs, nperseg=nperseg)
+    return freqs, power
+
+def compute_autocorr(signal, nlags=100):
+    """
+    Compute unbiased autocorrelation (can be used for spectral analysis).
+    :param signal: 1D signal.
+    :return: autocorrelation values.
+    """
+    return acf(signal, nlags=nlags, fft=True)
