@@ -153,90 +153,90 @@ def estimate_electricity_price(df, production_columns, cost_dict, demand_column)
 
     return unit_price.fillna(0)
 
-import pypsa
+#import pypsa
 import pandas as pd
 
-def create_simple_network(df, countries, cost_dict=None):
-    """
-    Crée un réseau PyPSA à partir d'un DataFrame contenant des colonnes horodatées de production,
-    de demande et d'interconnexions entre pays.
+# def create_simple_network(df, countries, cost_dict=None):
+#     """
+#     Crée un réseau PyPSA à partir d'un DataFrame contenant des colonnes horodatées de production,
+#     de demande et d'interconnexions entre pays.
 
-    Args:
-        df (pd.DataFrame): DataFrame avec index DateTime et colonnes :
-            - Demand_{country}
-            - Prod_{tech}_{country}
-            - link_{src}_{dst}
-        countries (list): liste des pays à inclure
-        cost_dict (dict): dictionnaire des coûts marginaux (€/MWh) par techno (optionnel)
+#     Args:
+#         df (pd.DataFrame): DataFrame avec index DateTime et colonnes :
+#             - Demand_{country}
+#             - Prod_{tech}_{country}
+#             - link_{src}_{dst}
+#         countries (list): liste des pays à inclure
+#         cost_dict (dict): dictionnaire des coûts marginaux (€/MWh) par techno (optionnel)
 
-    Returns:
-        pypsa.Network
-    """
-    # 0. Prérequis
-    df = df.apply(pd.to_numeric, errors='coerce')
+#     Returns:
+#         pypsa.Network
+#     """
+#     # 0. Prérequis
+#     df = df.apply(pd.to_numeric, errors='coerce')
 
-    # 1. Créer le réseau
-    net = pypsa.Network()
-    net.set_snapshots(df.index)
+#     # 1. Créer le réseau
+#     net = pypsa.Network()
+#     net.set_snapshots(df.index)
 
-    # 2. Ajouter les bus
-    for country in countries:
-        net.add("Bus", name=country, country=country, carrier="AC")
+#     # 2. Ajouter les bus
+#     for country in countries:
+#         net.add("Bus", name=country, country=country, carrier="AC")
 
-    # 3. Ajouter les charges (Load_{country})
-    for country in countries:
-        demand_col = f"Demand_{country}"
-        if demand_col in df.columns:
-            net.add("Load",
-                    name=f"Load_{country}",
-                    bus=country,
-                    p_set=df[demand_col])
-        else:
-            print(f"Avertissement : colonne {demand_col} manquante.")
+#     # 3. Ajouter les charges (Load_{country})
+#     for country in countries:
+#         demand_col = f"Demand_{country}"
+#         if demand_col in df.columns:
+#             net.add("Load",
+#                     name=f"Load_{country}",
+#                     bus=country,
+#                     p_set=df[demand_col])
+#         else:
+#             print(f"Avertissement : colonne {demand_col} manquante.")
 
-    # 4. Ajouter les générateurs (Prod_{tech}_{country})
-    for country in countries:
-        prod_cols = [col for col in df.columns if col.startswith("Prod_") and col.endswith(f"_{country}")]
-        for col in prod_cols:
-            _, tech, _ = col.split('_')
+#     # 4. Ajouter les générateurs (Prod_{tech}_{country})
+#     for country in countries:
+#         prod_cols = [col for col in df.columns if col.startswith("Prod_") and col.endswith(f"_{country}")]
+#         for col in prod_cols:
+#             _, tech, _ = col.split('_')
             
-            # Conversion explicite en float
-            p_max_pu = pd.to_numeric(df[col], errors='coerce')
-            p_nom = p_max_pu.max()
+#             # Conversion explicite en float
+#             p_max_pu = pd.to_numeric(df[col], errors='coerce')
+#             p_nom = p_max_pu.max()
 
-            # Sécurité : ignorer si colonne vide ou sans valeurs numériques
-            if pd.isna(p_nom) or p_nom == 0:
-                print(f"Avertissement : production vide ou nulle pour {col}, ignoré.")
-                continue
+#             # Sécurité : ignorer si colonne vide ou sans valeurs numériques
+#             if pd.isna(p_nom) or p_nom == 0:
+#                 print(f"Avertissement : production vide ou nulle pour {col}, ignoré.")
+#                 continue
 
-            net.add("Generator",
-                    name=col,
-                    bus=country,
-                    carrier=tech,
-                    p_nom=p_nom,
-                    p_max_pu=p_max_pu / p_nom,
-                    marginal_cost=cost_dict.get(tech, 100) if cost_dict else 100)
+#             net.add("Generator",
+#                     name=col,
+#                     bus=country,
+#                     carrier=tech,
+#                     p_nom=p_nom,
+#                     p_max_pu=p_max_pu / p_nom,
+#                     marginal_cost=cost_dict.get(tech, 100) if cost_dict else 100)
 
-    # 5. Ajouter les interconnexions (link_src_dst)
-    link_cols = [col for col in df.columns if col.startswith("link_")]
-    for col in link_cols:
-        try:
-            _, src, dst = col.split('_')
-        except ValueError:
-            continue
+#     # 5. Ajouter les interconnexions (link_src_dst)
+#     link_cols = [col for col in df.columns if col.startswith("link_")]
+#     for col in link_cols:
+#         try:
+#             _, src, dst = col.split('_')
+#         except ValueError:
+#             continue
 
-        if src in countries and dst in countries:
-            p_set = pd.to_numeric(df[col],errors='coerce')
-            capacity = p_set.abs().max()  # approximation de capacité max
-            net.add("Link",
-                    name=col,
-                    bus0=src,
-                    bus1=dst,
-                    p_nom=capacity,
-                    p_set=p_set,
-                    marginal_cost=0,
-                    efficiency=1.0)
-        else:
-            print(f"Ignoré : {col} (src ou dst non dans {countries})")
+#         if src in countries and dst in countries:
+#             p_set = pd.to_numeric(df[col],errors='coerce')
+#             capacity = p_set.abs().max()  # approximation de capacité max
+#             net.add("Link",
+#                     name=col,
+#                     bus0=src,
+#                     bus1=dst,
+#                     p_nom=capacity,
+#                     p_set=p_set,
+#                     marginal_cost=0,
+#                     efficiency=1.0)
+#         else:
+#             print(f"Ignoré : {col} (src ou dst non dans {countries})")
 
-    return net
+#     return net
